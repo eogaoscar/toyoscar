@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Selector Role Play Toyota Trade</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: white;
+            color: #000;
+        }
+        h1 {
+            color: #d60000;
+        }
+        textarea {
+            width: 400px;
+            height: 200px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #d60000;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        #countdown {
+            font-size: 80px;
+            font-weight: bold;
+            color: #d60000;
+            margin-top: 20px;
+        }
+        #result {
+            font-size: 32px;
+            margin-top: 20px;
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+        #result.show {
+            animation: zoomFade 1s ease forwards;
+        }
+        @keyframes zoomFade {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+        }
+        #used {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        img {
+            height: 80px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <img src="logo_toyota.png" alt="Toyota Logo" style="width: 100px; display: block; margin: 20px auto;">
+    <h1>Selector Role Play Toyota Trade</h1>
+
+    <textarea id="nombres" placeholder="Nombre"></textarea><br>
+    <button onclick="iniciarSorteo()">Iniciar sorteo</button>
+    <button onclick="seleccionarParticipantes()">Seleccionar 2 participantes</button>
+<button onclick="seleccionarUno()">Seleccionar 1 participante</button>
+    <button onclick="reiniciarLista()">Reiniciar lista</button>
+
+    <div id="countdown"></div>
+    <div id="result"></div>
+    <div id="used"><strong>Seleccionados anteriormente:</strong><ul id="anteriores"></ul></div>
+
+    <audio id="tambor" preload="auto"><source src="drumroll.mp3" type="audio/mpeg"></audio>
+
+    <script>
+        let nombresDisponibles = [];
+        let nombresUsados = [];
+
+        function iniciarSorteo() {
+            const textarea = document.getElementById("nombres").value.trim();
+            if (!textarea) {
+                alert("Introduce al menos un nombre.");
+                return;
+            }
+            nombresDisponibles = textarea.split("\n").filter(n => n.trim() !== "");
+            nombresUsados = [];
+            document.getElementById("anteriores").innerHTML = "";
+            document.getElementById("result").innerText = "";
+            document.getElementById("result").classList.remove("show");
+            alert("Sorteo iniciado. Puedes seleccionar participantes.");
+        }
+
+        function seleccionarParticipantes() {
+            if (nombresDisponibles.length < 2) {
+                alert("No hay suficientes nombres disponibles.");
+                return;
+            }
+
+            let cuenta = 5;
+            const countdownEl = document.getElementById("countdown");
+            const tambor = document.getElementById("tambor");
+            tambor.currentTime = 0;
+            tambor.play();
+
+            countdownEl.innerText = cuenta;
+
+            const intervalo = setInterval(() => {
+                cuenta--;
+                if (cuenta > 0) {
+                    countdownEl.innerText = cuenta;
+                } else {
+                    clearInterval(intervalo);
+                    countdownEl.innerText = "";
+                    tambor.pause();
+
+                    const seleccionados = [];
+                    for (let i = 0; i < 2; i++) {
+                        const index = Math.floor(Math.random() * nombresDisponibles.length);
+                        seleccionados.push(nombresDisponibles.splice(index, 1)[0]);
+                    }
+
+                    const resultEl = document.getElementById("result");
+                    resultEl.innerText = `🎭 ${seleccionados[0]} y ${seleccionados[1]}`;
+                    resultEl.classList.add("show");
+    confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+
+                    seleccionados.forEach(n => {
+                        nombresUsados.push(n);
+                        const li = document.createElement("li");
+                        li.textContent = n;
+                        document.getElementById("anteriores").appendChild(li);
+                    });
+                }
+            }, 1000);
+        }
+
+        function reiniciarLista() {
+            nombresDisponibles = [];
+            nombresUsados = [];
+            document.getElementById("nombres").value = "";
+            document.getElementById("result").innerText = "";
+            document.getElementById("result").classList.remove("show");
+            document.getElementById("anteriores").innerHTML = "";
+            document.getElementById("countdown").innerText = "";
+        }
+    
+function seleccionarUno() {
+  if (nombresDisponibles.length < 1) {
+    alert("No hay suficientes nombres disponibles.");
+    return;
+  }
+
+  let cuenta = 5;
+  const countdownEl = document.getElementById("countdown");
+  const tambor = document.getElementById("tambor");
+
+  tambor.currentTime = 0;
+  tambor.play();
+
+  countdownEl.innerText = cuenta;
+
+  const intervalo = setInterval(() => {
+    cuenta--;
+    if (cuenta > 0) {
+      countdownEl.innerText = cuenta;
+    } else {
+      clearInterval(intervalo);
+      countdownEl.innerText = "";
+      tambor.pause();
+
+      const index = Math.floor(Math.random() * nombresDisponibles.length);
+      const seleccionado = nombresDisponibles.splice(index, 1)[0];
+
+      const resultEl = document.getElementById("result");
+      resultEl.innerText = `🎭 ${seleccionado}`;
+      resultEl.classList.add("show");
+
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      nombresUsados.push(seleccionado);
+      const li = document.createElement("li");
+      li.textContent = seleccionado;
+      document.getElementById("anteriores").appendChild(li);
+    }
+  }, 1000);
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
+function seleccionarUno() {
+  if (nombresDisponibles.length < 1) {
+    alert("No hay suficientes nombres disponibles.");
+    return;
+  }
+
+  let cuenta = 5;
+  const countdownEl = document.getElementById("countdown");
+  const tambor = document.getElementById("tambor");
+
+  tambor.currentTime = 0;
+  tambor.play();
+
+  countdownEl.innerText = cuenta;
+
+  const intervalo = setInterval(() => {
+    cuenta--;
+    if (cuenta > 0) {
+      countdownEl.innerText = cuenta;
+    } else {
+      clearInterval(intervalo);
+      countdownEl.innerText = "";
+      tambor.pause();
+
+      const index = Math.floor(Math.random() * nombresDisponibles.length);
+      const seleccionado = nombresDisponibles.splice(index, 1)[0];
+
+      const resultEl = document.getElementById("result");
+      resultEl.innerText = `🎭 ${seleccionado}`;
+      resultEl.classList.add("show");
+
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      nombresUsados.push(seleccionado);
+      const li = document.createElement("li");
+      li.textContent = seleccionado;
+      document.getElementById("anteriores").appendChild(li);
+    }
+  }, 1000);
+}
+
+</script>
+</body>
+</html>
