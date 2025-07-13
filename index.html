@@ -1,17 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- CABECERA: configuración y estilos -->
     <meta charset="UTF-8">
     <title>Selector Role Play Toyota Trade</title>
+        <!-- ESTILOS DE LA PÁGINA -->
     <style>
+
+        .fondo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro semitransparente */
+            z-index: 0;
+        }
+
+        body * {
+            position: relative;
+            z-index: 1;
+        }
+
+
+        body {
+            background-image: url('fondo_convertido.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: white;
-            color: #000;
+            color: white;
         }
         h1 {
-            color: #d60000;
+            color: white;
         }
         textarea {
             width: 400px;
@@ -32,7 +59,7 @@
         #countdown {
             font-size: 80px;
             font-weight: bold;
-            color: #d60000;
+            color: white;
             margin-top: 20px;
         }
         #result {
@@ -62,29 +89,54 @@
             height: 80px;
             margin-top: 10px;
         }
+    
+        /* Estilo exclusivo para mostrar los nombres de equipos sin desbordar */
+        .equipos-resultados {
+            font-size: 22px;
+            max-width: 90%;
+            margin: 20px auto;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+        }
+
     </style>
 </head>
 <body>
+    <div class="fondo-overlay"></div>
+    <!-- CUERPO DE LA PÁGINA -->
+        <!-- LOGO PRINCIPAL -->
     <img src="logo_toyota.png" alt="Toyota Logo" style="width: 100px; display: block; margin: 20px auto;">
+        <!-- TÍTULO PRINCIPAL -->
     <h1>Selector Role Play Toyota Trade</h1>
 
+        <!-- ÁREA DE TEXTO PARA NOMBRES -->
     <textarea id="nombres" placeholder="Nombre"></textarea><br>
+        <!-- BOTONES DE ACCIÓN -->
     <button onclick="iniciarSorteo()">Iniciar sorteo</button>
-    <button onclick="seleccionarParticipantes()">Seleccionar 2 participantes</button>
 <button onclick="seleccionarUno()">Seleccionar 1 participante</button>
-    <button onclick="reiniciarLista()">Reiniciar lista</button>
+ <button onclick="seleccionarParticipantes()">Seleccionar 2 participantes</button>
+<button onclick="generarTresEquipos()">Generar 3 equipos </button>
+ <button onclick="reiniciarLista()">Reiniciar lista</button>
 
+        <!-- CUENTA REGRESIVA -->
     <div id="countdown"></div>
+        <!-- RESULTADOS -->
     <div id="result"></div>
+        <!-- LISTA DE SELECCIONADOS ANTERIORMENTE -->
     <div id="used"><strong>Seleccionados anteriormente:</strong><ul id="anteriores"></ul></div>
 
+        <!-- SONIDO DE TAMBOR -->
     <audio id="tambor" preload="auto"><source src="drumroll.mp3" type="audio/mpeg"></audio>
 
     <script>
+    // ==== VARIABLES GLOBALES Y FUNCIONES ====
         let nombresDisponibles = [];
         let nombresUsados = [];
 
-        function iniciarSorteo() {
+        
+    // Inicia el sorteo cargando la lista
+    function iniciarSorteo() {
             const textarea = document.getElementById("nombres").value.trim();
             if (!textarea) {
                 alert("Introduce al menos un nombre.");
@@ -98,7 +150,9 @@
             alert("Sorteo iniciado. Puedes seleccionar participantes.");
         }
 
-        function seleccionarParticipantes() {
+        
+    // Selecciona aleatoriamente 2 participantes con cuenta regresiva y sonido
+    function seleccionarParticipantes() {
             if (nombresDisponibles.length < 2) {
                 alert("No hay suficientes nombres disponibles.");
                 return;
@@ -146,7 +200,9 @@
             }, 1000);
         }
 
-        function reiniciarLista() {
+        
+    // Reinicia la lista y limpia resultados
+    function reiniciarLista() {
             nombresDisponibles = [];
             nombresUsados = [];
             document.getElementById("nombres").value = "";
@@ -156,7 +212,9 @@
             document.getElementById("countdown").innerText = "";
         }
     
-function seleccionarUno() {
+
+    // Selecciona aleatoriamente 1 participante
+    function seleccionarUno() {
   if (nombresDisponibles.length < 1) {
     alert("No hay suficientes nombres disponibles.");
     return;
@@ -201,53 +259,62 @@ function seleccionarUno() {
   }, 1000);
 }
 
+
+
+    // Genera 3 equipos equilibrados a partir de la lista de nombres
+   
+ 
+   
+    function generarTresEquipos() {
+    const textarea = document.getElementById("nombres").value.trim();
+    if (!textarea) {
+        alert("Introduce al menos un nombre.");
+        return;
+    }
+
+       tambor.currentTime = 0;
+        tambor.play();
+
+    let nombres = textarea.split("\n").map(n => n.trim()).filter(n => n !== "");
+    if (nombres.length < 3) {
+       alert("Se necesitan al menos 3 nombres para formar tres equipos.");
+      return;
+   }
+
+    // Mezclar aleatoriamente los nombres
+    for (let i = nombres.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [nombres[i], nombres[j]] = [nombres[j], nombres[i]];
+    }
+
+
+    // Crear 3 equipos
+    const equipos = [[], [], []];
+    for (let i = 0; i < nombres.length; i++) {
+        equipos[i % 3].push(nombres[i]);
+    }
+
+    const resultEl = document.getElementById("result");
+    resultEl.innerHTML = equipos.map((equipo, i) => `👥 Equipo ${i + 1}: ${equipo.join(", ")}`).join("<br><br>");
+    resultEl.classList.add("equipos-resultados");
+    resultEl.classList.add("show");
+
+    nombresDisponibles = [];
+    nombresUsados = [];
+    document.getElementById("anteriores").innerHTML = "";
+    document.getElementById("countdown").innerText = "";
+
+   
+
+    confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js">
-function seleccionarUno() {
-  if (nombresDisponibles.length < 1) {
-    alert("No hay suficientes nombres disponibles.");
-    return;
-  }
-
-  let cuenta = 5;
-  const countdownEl = document.getElementById("countdown");
-  const tambor = document.getElementById("tambor");
-
-  tambor.currentTime = 0;
-  tambor.play();
-
-  countdownEl.innerText = cuenta;
-
-  const intervalo = setInterval(() => {
-    cuenta--;
-    if (cuenta > 0) {
-      countdownEl.innerText = cuenta;
-    } else {
-      clearInterval(intervalo);
-      countdownEl.innerText = "";
-      tambor.pause();
-
-      const index = Math.floor(Math.random() * nombresDisponibles.length);
-      const seleccionado = nombresDisponibles.splice(index, 1)[0];
-
-      const resultEl = document.getElementById("result");
-      resultEl.innerText = `🎭 ${seleccionado}`;
-      resultEl.classList.add("show");
-
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-
-      nombresUsados.push(seleccionado);
-      const li = document.createElement("li");
-      li.textContent = seleccionado;
-      document.getElementById("anteriores").appendChild(li);
-    }
-  }, 1000);
-}
 
 </script>
 </body>
